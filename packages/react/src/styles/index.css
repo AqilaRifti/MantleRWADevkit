@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom component styles */
+.rwa-card {
+    @apply rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800;
+}
+
+.rwa-button {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.rwa-button-primary {
+    @apply rwa-button bg-mantle-600 text-white hover:bg-mantle-700 focus:ring-mantle-500;
+}
+
+.rwa-button-secondary {
+    @apply rwa-button border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-mantle-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700;
+}
+
+.rwa-input {
+    @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-mantle-500 focus:outline-none focus:ring-1 focus:ring-mantle-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500;
+}
+
+.rwa-label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-200;
+}

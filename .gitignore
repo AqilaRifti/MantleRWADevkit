@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+.kiro
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+typechain-types/
+
+# Test & Coverage
+coverage/
+.nyc_output/
+
+# Foundry
+cache/
+broadcast/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Turbo
+.turbo/
+
+# Misc
+*.tsbuildinfo

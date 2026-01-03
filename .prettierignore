@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.next
+coverage
+typechain-types
+out
+cache
+*.min.js
+pnpm-lock.yaml
