@@ -7,61 +7,118 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { WalletConnect } from '@/components/wallet-connect';
 import { contractAddresses, propertyDetails } from '@/config/wagmi';
+import { useRWAClient } from '@/hooks/use-rwa-client';
+import { useToken } from '@/hooks/use-token';
+import { useKYC, AccreditationTier } from '@/hooks/use-kyc';
+import { useYield } from '@/hooks/use-yield';
+import { useCompliance } from '@/hooks/use-compliance';
+import { CodeSnippet } from '@/components/sdk/code-snippet';
+import { TransactionStatus } from '@/components/sdk/transaction-status';
+import { ComplianceCheckResult } from '@/components/sdk/compliance-check-result';
+import { EventFeed } from '@/components/sdk/event-feed';
+import { useEvents } from '@/hooks/use-events';
+import { formatAmount } from '@mantle-rwa/sdk';
 import { toast } from 'sonner';
-import { Building2, Coins, Clock, ArrowLeft } from 'lucide-react';
+import {
+    Building2,
+    Coins,
+    Clock,
+    ArrowLeft,
+    Wallet,
+    Shield,
+    CheckCircle2,
+    XCircle,
+    TrendingUp,
+    Code2,
+    AlertTriangle,
+    RefreshCw,
+    HandCoins,
+    FileCheck,
+} from 'lucide-react';
 import Link from 'next/link';
 
-// Import from @mantle-rwa/react package
-import { KYCFlow, InvestorDashboard } from '@mantle-rwa/react';
-import type { KYCResult } from '@mantle-rwa/react';
+const TIER_LABELS: Record<AccreditationTier, string> = {
+    [AccreditationTier.None]: 'None',
+    [AccreditationTier.Retail]: 'Retail',
+    [AccreditationTier.Accredited]: 'Accredited',
+    [AccreditationTier.Institutional]: 'Institutional',
+};
 
 export default function InvestorPortalPage() {
     const { address, isConnected } = useAccount();
-    const [isKYCVerified, setIsKYCVerified] = useState(false);
-    const [purchaseAmount, setPurchaseAmount] = useState('');
-    const [isPurchasing, setIsPurchasing] = useState(false);
+    const { isInitialized, networkInfo, hasSigner } = useRWAClient();
 
-    // Handle KYC completion from the SDK component
-    const handleKYCComplete = useCallback((result: KYCResult) => {
-        console.log('KYC completed:', result);
-        setIsKYCVerified(true);
-        toast.success('KYC verification completed successfully!');
-    }, []);
+    // SDK Hooks
+    const { tokenInfo, balance, isLoading: tokenLoading, transfer, isPending: tokenPending } = useToken(contractAddresses.rwaToken);
+    const { isVerified, investorInfo, isLoading: kycLoading } = useKYC(contractAddresses.kycRegistry);
+    const { distributions, pendingClaims, totalClaimable, claim, isLoading: yieldLoading, isPending: yieldPending } = useYield(
+        contractAddresses.yieldDistributor,
+        contractAddresses.rwaToken
+    );
+    const { checkTransferEligibility, lastEligibilityCheck, isLoading: complianceLoading } = useCompliance(contractAddresses.rwaToken);
+    const { events, subscribe, unsubscribe, isSubscribed, clearEvents } = useEvents({
+        tokenAddress: contractAddresses.rwaToken,
+        kycRegistryAddress: contractAddresses.kycRegistry,
+        yieldDistributorAddress: contractAddresses.yieldDistributor,
+    });
 
-    // Handle KYC error
-    const handleKYCError = useCallback((error: Error) => {
-        console.error('KYC error:', error);
-        toast.error(`KYC verification failed: ${error.message}`);
-    }, []);
+    // Local state
+    const [transferTo, setTransferTo] = useState('');
+    const [transferAmount, setTransferAmount] = useState('');
+    const [lastTxHash, setLastTxHash] = useState<string | null>(null);
+    const [lastTxStatus, setLastTxStatus] = useState<'pending' | 'success' | 'failed' | null>(null);
 
-    // Handle yield claim from InvestorDashboard
-    const handleClaimYield = useCallback((distributionId: number) => {
-        console.log('Claiming yield for distribution:', distributionId);
-        toast.success(`Claiming yield for distribution #${distributionId}`);
-    }, []);
-
-    // Handle token purchase
-    const handlePurchase = useCallback(async () => {
-        const amount = parseInt(purchaseAmount);
-        if (!amount || amount <= 0) {
-            toast.error('Please enter a valid amount');
+    // Handle transfer
+    const handleTransfer = useCallback(async () => {
+        if (!transferTo || !transferAmount) {
+            toast.error('Please enter recipient and amount');
             return;
         }
 
-        setIsPurchasing(true);
+        setLastTxStatus('pending');
         try {
-            // Simulate purchase transaction - in production would use SDK
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            setPurchaseAmount('');
-            toast.success(`Successfully purchased ${amount} ${propertyDetails.tokenSymbol} tokens!`);
+            // First check eligibility
+            const eligibility = await checkTransferEligibility(address!, transferTo, transferAmount);
+            if (!eligibility.eligible) {
+                toast.error(`Transfer not allowed: ${eligibility.reason}`);
+                setLastTxStatus('failed');
+                return;
+            }
+
+            const result = await transfer(transferTo, transferAmount);
+            setLastTxHash(result.hash);
+            setLastTxStatus('success');
+            setTransferTo('');
+            setTransferAmount('');
+            toast.success('Transfer successful!');
         } catch (error) {
-            toast.error('Purchase failed. Please try again.');
-        } finally {
-            setIsPurchasing(false);
+            setLastTxStatus('failed');
+            toast.error(error instanceof Error ? error.message : 'Transfer failed');
         }
-    }, [purchaseAmount]);
+    }, [address, transferTo, transferAmount, transfer, checkTransferEligibility]);
+
+    // Handle yield claim
+    const handleClaim = useCallback(async (distributionId: number) => {
+        setLastTxStatus('pending');
+        try {
+            const result = await claim(distributionId);
+            setLastTxHash(result.hash);
+            setLastTxStatus('success');
+            toast.success('Yield claimed successfully!');
+        } catch (error) {
+            setLastTxStatus('failed');
+            toast.error(error instanceof Error ? error.message : 'Claim failed');
+        }
+    }, [claim]);
+
+    // Calculate portfolio value
+    const portfolioValue = balance && tokenInfo
+        ? (Number(balance) / Math.pow(10, tokenInfo.decimals)) * propertyDetails.tokenPrice
+        : 0;
 
     return (
         <div className="min-h-screen bg-background">
@@ -77,8 +134,19 @@ export default function InvestorPortalPage() {
                             <Building2 className="h-6 w-6 text-primary" />
                             <span className="text-xl font-bold">Investor Portal</span>
                         </div>
+                        {networkInfo && (
+                            <Badge variant="outline" className="text-xs">
+                                {networkInfo.name}
+                            </Badge>
+                        )}
                     </div>
-                    <WalletConnect />
+                    <div className="flex items-center gap-4">
+                        <Badge variant={isInitialized ? 'default' : 'secondary'} className="gap-1">
+                            <Code2 className="h-3 w-3" />
+                            SDK {isInitialized ? 'Ready' : 'Loading'}
+                        </Badge>
+                        <WalletConnect />
+                    </div>
                 </div>
             </header>
 
@@ -87,121 +155,386 @@ export default function InvestorPortalPage() {
                     /* Not Connected State */
                     <Card className="mx-auto max-w-md">
                         <CardHeader className="text-center">
+                            <Wallet className="mx-auto h-12 w-12 text-muted-foreground" />
                             <CardTitle>Connect Your Wallet</CardTitle>
                             <CardDescription>
                                 Connect your wallet to access the investor portal and manage your investments.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="flex justify-center">
-                            <WalletConnect />
+                        <CardContent className="space-y-4">
+                            <div className="flex justify-center">
+                                <WalletConnect />
+                            </div>
+                            <CodeSnippet
+                                title="SDK Hook: useRWAClient"
+                                code={`// Initialize SDK with wallet
+const { client, isInitialized, hasSigner } = useRWAClient();
+
+// Client automatically connects to wallet signer
+if (hasSigner) {
+  // Can perform write operations
+}`}
+                                collapsible={true}
+                                defaultExpanded={false}
+                            />
                         </CardContent>
                     </Card>
-                ) : !isKYCVerified ? (
-                    /* KYC Required - Using SDK KYCFlow Component */
-                    <div className="mx-auto max-w-2xl space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Identity Verification Required</CardTitle>
-                                <CardDescription>
-                                    Complete KYC verification to invest in tokenized real estate.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <KYCFlow
-                                    provider="persona"
-                                    requiredFields={['identity', 'accreditation', 'address']}
-                                    onComplete={handleKYCComplete}
-                                    onError={handleKYCError}
-                                    theme="light"
-                                    registryAddress={contractAddresses.kycRegistry}
-                                    autoUpdateRegistry={true}
-                                />
+                ) : (
+                    <div className="space-y-6">
+                        {/* KYC Status Banner */}
+                        <Card className={isVerified ? 'border-green-500/50 bg-green-500/5' : 'border-yellow-500/50 bg-yellow-500/5'}>
+                            <CardContent className="flex items-center justify-between py-4">
+                                <div className="flex items-center gap-3">
+                                    {kycLoading ? (
+                                        <Skeleton className="h-10 w-10 rounded-full" />
+                                    ) : isVerified ? (
+                                        <CheckCircle2 className="h-10 w-10 text-green-500" />
+                                    ) : (
+                                        <AlertTriangle className="h-10 w-10 text-yellow-500" />
+                                    )}
+                                    <div>
+                                        <p className="font-medium">
+                                            {kycLoading ? 'Checking KYC status...' : isVerified ? 'KYC Verified' : 'KYC Required'}
+                                        </p>
+                                        {investorInfo && isVerified && (
+                                            <p className="text-sm text-muted-foreground">
+                                                Tier: {TIER_LABELS[investorInfo.tier]} •
+                                                Expires: {investorInfo.expiry.toLocaleDateString()}
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                                <Badge variant={isVerified ? 'default' : 'secondary'} className="gap-1">
+                                    <FileCheck className="h-3 w-3" />
+                                    useKYC Hook
+                                </Badge>
                             </CardContent>
                         </Card>
-                    </div>
-                ) : (
-                    /* Verified Investor - Using SDK InvestorDashboard Component */
-                    <div className="space-y-6">
-                        <Tabs defaultValue="dashboard" className="space-y-4">
-                            <TabsList>
-                                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                                <TabsTrigger value="invest">Invest</TabsTrigger>
+
+                        <Tabs defaultValue="portfolio" className="space-y-4">
+                            <TabsList className="grid w-full grid-cols-4">
+                                <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
+                                <TabsTrigger value="yield">Yield</TabsTrigger>
+                                <TabsTrigger value="transfer">Transfer</TabsTrigger>
+                                <TabsTrigger value="events">Events</TabsTrigger>
                             </TabsList>
 
-                            {/* Dashboard Tab - Using SDK InvestorDashboard */}
-                            <TabsContent value="dashboard">
-                                <InvestorDashboard
-                                    tokenAddress={contractAddresses.rwaToken}
-                                    yieldDistributorAddress={contractAddresses.yieldDistributor}
-                                    kycRegistryAddress={contractAddresses.kycRegistry}
-                                    onClaimYield={handleClaimYield}
-                                    showPortfolioValue={true}
-                                    theme="light"
+                            {/* Portfolio Tab */}
+                            <TabsContent value="portfolio" className="space-y-4">
+                                <div className="grid gap-4 md:grid-cols-3">
+                                    <Card>
+                                        <CardHeader className="pb-2">
+                                            <CardDescription className="flex items-center gap-2">
+                                                Token Balance
+                                                <Badge variant="outline" className="text-xs">useToken</Badge>
+                                            </CardDescription>
+                                            {tokenLoading ? (
+                                                <Skeleton className="h-9 w-32" />
+                                            ) : (
+                                                <CardTitle className="text-3xl">
+                                                    {balance ? formatAmount(balance) : '0'}
+                                                </CardTitle>
+                                            )}
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground">
+                                                {tokenInfo?.symbol || propertyDetails.tokenSymbol} tokens
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card>
+                                        <CardHeader className="pb-2">
+                                            <CardDescription>Portfolio Value</CardDescription>
+                                            {tokenLoading ? (
+                                                <Skeleton className="h-9 w-32" />
+                                            ) : (
+                                                <CardTitle className="text-3xl">
+                                                    ${portfolioValue.toLocaleString()}
+                                                </CardTitle>
+                                            )}
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground">
+                                                @ ${propertyDetails.tokenPrice}/token
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+
+                                    <Card>
+                                        <CardHeader className="pb-2">
+                                            <CardDescription className="flex items-center gap-2">
+                                                Pending Yields
+                                                <Badge variant="outline" className="text-xs">useYield</Badge>
+                                            </CardDescription>
+                                            {yieldLoading ? (
+                                                <Skeleton className="h-9 w-32" />
+                                            ) : (
+                                                <CardTitle className="text-3xl text-green-600">
+                                                    {totalClaimable > 0n ? formatAmount(totalClaimable) : '0'}
+                                                </CardTitle>
+                                            )}
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm text-muted-foreground">
+                                                {pendingClaims.length} pending claim(s)
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+
+                                <CodeSnippet
+                                    title="SDK Code: Fetching Portfolio Data"
+                                    code={`// Get token balance
+const token = client.token.connect(tokenAddress);
+const balance = await token.balanceOf(walletAddress);
+
+// Get pending yields
+const distributor = client.yield.connect(distributorAddress);
+const claims = await distributor.getPendingClaims(walletAddress);
+
+// Calculate total claimable
+const total = claims.reduce((sum, c) => sum + c.amount, 0n);`}
+                                    collapsible={true}
+                                    defaultExpanded={false}
                                 />
                             </TabsContent>
 
-                            {/* Invest Tab */}
-                            <TabsContent value="invest" className="space-y-4">
+                            {/* Yield Tab */}
+                            <TabsContent value="yield" className="space-y-4">
                                 <Card>
                                     <CardHeader>
-                                        <CardTitle>Purchase Tokens</CardTitle>
-                                        <CardDescription>
-                                            Buy {propertyDetails.tokenSymbol} tokens to own a fraction of {propertyDetails.name}
-                                        </CardDescription>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <CardTitle className="flex items-center gap-2">
+                                                    <TrendingUp className="h-5 w-5" />
+                                                    Yield Distributions
+                                                </CardTitle>
+                                                <CardDescription>
+                                                    Claim your share of property rental income
+                                                </CardDescription>
+                                            </div>
+                                            <Badge variant="outline" className="gap-1">
+                                                <Code2 className="h-3 w-3" />
+                                                useYield Hook
+                                            </Badge>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent className="space-y-4">
+                                        {yieldLoading ? (
+                                            <div className="space-y-2">
+                                                <Skeleton className="h-20 w-full" />
+                                                <Skeleton className="h-20 w-full" />
+                                            </div>
+                                        ) : pendingClaims.length === 0 ? (
+                                            <div className="text-center py-8 text-muted-foreground">
+                                                <HandCoins className="mx-auto h-12 w-12 mb-2 opacity-50" />
+                                                <p>No pending yields to claim</p>
+                                            </div>
+                                        ) : (
+                                            pendingClaims.map((claim) => (
+                                                <div
+                                                    key={claim.distributionId}
+                                                    className="flex items-center justify-between p-4 rounded-lg border bg-muted/50"
+                                                >
+                                                    <div>
+                                                        <p className="font-medium">
+                                                            Distribution #{claim.distributionId}
+                                                        </p>
+                                                        <p className="text-sm text-muted-foreground">
+                                                            Amount: {formatAmount(claim.amount)} •
+                                                            Deadline: {claim.deadline.toLocaleDateString()}
+                                                        </p>
+                                                    </div>
+                                                    <Button
+                                                        onClick={() => handleClaim(claim.distributionId)}
+                                                        disabled={yieldPending}
+                                                    >
+                                                        {yieldPending ? (
+                                                            <RefreshCw className="h-4 w-4 animate-spin" />
+                                                        ) : (
+                                                            'Claim'
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                            ))
+                                        )}
+
+                                        {lastTxStatus && lastTxHash && (
+                                            <TransactionStatus
+                                                status={lastTxStatus}
+                                                hash={lastTxHash}
+                                                explorerUrl={networkInfo?.explorerUrl}
+                                            />
+                                        )}
+                                    </CardContent>
+                                </Card>
+
+                                <CodeSnippet
+                                    title="SDK Code: Claiming Yield"
+                                    code={`// Claim yield from a distribution
+const distributor = client.yield.connect(distributorAddress);
+const result = await distributor.claim(distributionId);
+
+console.log('Transaction hash:', result.hash);
+console.log('Gas used:', result.gasUsed);`}
+                                    collapsible={true}
+                                    defaultExpanded={false}
+                                />
+                            </TabsContent>
+
+                            {/* Transfer Tab */}
+                            <TabsContent value="transfer" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <CardTitle>Transfer Tokens</CardTitle>
+                                                <CardDescription>
+                                                    Transfer your tokens to another verified investor
+                                                </CardDescription>
+                                            </div>
+                                            <Badge variant="outline" className="gap-1">
+                                                <Code2 className="h-3 w-3" />
+                                                useCompliance Hook
+                                            </Badge>
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="space-y-4">
                                         <div className="grid gap-4 md:grid-cols-2">
                                             <div className="space-y-2">
-                                                <Label htmlFor="amount">Number of Tokens</Label>
+                                                <Label htmlFor="transferTo">Recipient Address</Label>
                                                 <Input
-                                                    id="amount"
-                                                    type="number"
-                                                    placeholder="Enter amount"
-                                                    value={purchaseAmount}
-                                                    onChange={(e) => setPurchaseAmount(e.target.value)}
-                                                    min="1"
+                                                    id="transferTo"
+                                                    placeholder="0x..."
+                                                    value={transferTo}
+                                                    onChange={(e) => setTransferTo(e.target.value)}
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <Label>Total Cost</Label>
-                                                <div className="flex h-10 items-center rounded-md border bg-muted px-3">
-                                                    ${((parseInt(purchaseAmount) || 0) * propertyDetails.tokenPrice).toLocaleString()}
-                                                </div>
+                                                <Label htmlFor="transferAmount">Amount</Label>
+                                                <Input
+                                                    id="transferAmount"
+                                                    type="number"
+                                                    placeholder="100"
+                                                    value={transferAmount}
+                                                    onChange={(e) => setTransferAmount(e.target.value)}
+                                                />
                                             </div>
                                         </div>
-                                        <div className="flex items-center justify-between rounded-lg bg-muted p-4">
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Token Price</p>
-                                                <p className="font-medium">${propertyDetails.tokenPrice} per token</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-sm text-muted-foreground">Expected Yield</p>
-                                                <p className="font-medium text-green-600">{propertyDetails.expectedYield}% APY</p>
-                                            </div>
-                                        </div>
+
                                         <Button
                                             className="w-full"
-                                            size="lg"
-                                            onClick={handlePurchase}
-                                            disabled={isPurchasing || !purchaseAmount}
+                                            onClick={handleTransfer}
+                                            disabled={tokenPending || !transferTo || !transferAmount}
                                         >
-                                            {isPurchasing ? (
+                                            {tokenPending ? (
                                                 <>
-                                                    <Clock className="mr-2 h-4 w-4 animate-spin" />
+                                                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                                                     Processing...
                                                 </>
                                             ) : (
                                                 <>
                                                     <Coins className="mr-2 h-4 w-4" />
-                                                    Purchase Tokens
+                                                    Transfer Tokens
                                                 </>
                                             )}
                                         </Button>
-                                        <p className="text-center text-xs text-muted-foreground">
-                                            Testnet only - uses mock USDC for demonstration
-                                        </p>
+
+                                        {lastEligibilityCheck && (
+                                            <ComplianceCheckResult
+                                                result={lastEligibilityCheck}
+                                                from={address}
+                                                to={transferTo}
+                                                amount={transferAmount}
+                                                compact={true}
+                                            />
+                                        )}
+
+                                        {lastTxStatus && lastTxHash && (
+                                            <TransactionStatus
+                                                status={lastTxStatus}
+                                                hash={lastTxHash}
+                                                explorerUrl={networkInfo?.explorerUrl}
+                                            />
+                                        )}
                                     </CardContent>
                                 </Card>
+
+                                <CodeSnippet
+                                    title="SDK Code: Transfer with Compliance Check"
+                                    code={`// Check transfer eligibility first
+const eligibility = await client.compliance.checkTransferEligibility(
+  tokenAddress,
+  fromAddress,
+  toAddress,
+  amount
+);
+
+if (eligibility.eligible) {
+  // Execute transfer
+  const token = client.token.connect(tokenAddress);
+  const result = await token.transfer(toAddress, amount);
+}`}
+                                    collapsible={true}
+                                    defaultExpanded={false}
+                                />
+                            </TabsContent>
+
+                            {/* Events Tab */}
+                            <TabsContent value="events" className="space-y-4">
+                                <Card>
+                                    <CardHeader>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <CardTitle>Live Blockchain Events</CardTitle>
+                                                <CardDescription>
+                                                    Real-time event subscriptions using ethers.js
+                                                </CardDescription>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant="outline" className="gap-1">
+                                                    <Code2 className="h-3 w-3" />
+                                                    useEvents Hook
+                                                </Badge>
+                                                <Button
+                                                    variant={isSubscribed ? 'destructive' : 'default'}
+                                                    size="sm"
+                                                    onClick={isSubscribed ? unsubscribe : subscribe}
+                                                >
+                                                    {isSubscribed ? 'Stop' : 'Start'} Listening
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <EventFeed
+                                            events={events}
+                                            explorerUrl={networkInfo?.explorerUrl}
+                                            onClear={clearEvents}
+                                            maxHeight={300}
+                                        />
+                                    </CardContent>
+                                </Card>
+
+                                <CodeSnippet
+                                    title="SDK Code: Event Subscriptions"
+                                    code={`// Subscribe to Transfer events
+const tokenContract = new ethers.Contract(
+  tokenAddress,
+  RWA_TOKEN_ABI,
+  provider
+);
+
+tokenContract.on('Transfer', (from, to, value, event) => {
+  console.log(\`Transfer: \${value} from \${from} to \${to}\`);
+});
+
+// Don't forget to unsubscribe
+tokenContract.off('Transfer', handler);`}
+                                    collapsible={true}
+                                    defaultExpanded={false}
+                                />
                             </TabsContent>
                         </Tabs>
                     </div>

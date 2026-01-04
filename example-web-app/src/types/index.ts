@@ -1,11 +1,7 @@
 import { Icons } from '@/components/icons';
 
-export interface PermissionCheck {
-  permission?: string;
-  plan?: string;
-  feature?: string;
-  role?: string;
-  requireOrg?: boolean;
+export interface NavAccessConfig {
+  requiresWallet?: boolean;
 }
 
 export interface NavItem {
@@ -19,7 +15,7 @@ export interface NavItem {
   description?: string;
   isActive?: boolean;
   items?: NavItem[];
-  access?: PermissionCheck;
+  access?: NavAccessConfig;
 }
 
 export interface NavItemWithChildren extends NavItem {

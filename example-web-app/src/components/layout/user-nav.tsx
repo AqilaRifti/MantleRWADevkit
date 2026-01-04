@@ -9,18 +9,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { UserAvatarProfile } from '@/components/user-avatar-profile';
-import { SignOutButton, useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
+import { WalletAvatar } from '@/components/wallet-avatar';
+import { truncateAddress } from '@/lib/wallet-utils';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { toast } from 'sonner';
+import { Copy, ExternalLink, LogOut, Wallet } from 'lucide-react';
+
 export function UserNav() {
-  const { user } = useUser();
-  const router = useRouter();
-  if (user) {
+  const { address, isConnected, chain } = useAccount();
+  const { connect, connectors, isPending } = useConnect();
+  const { disconnect } = useDisconnect();
+
+  const copyAddress = () => {
+    if (address) {
+      navigator.clipboard.writeText(address);
+      toast.success('Address copied to clipboard');
+    }
+  };
+
+  const openExplorer = () => {
+    if (address && chain) {
+      const explorerUrl = chain.blockExplorers?.default?.url;
+      if (explorerUrl) {
+        window.open(`${explorerUrl}/address/${address}`, '_blank');
+      }
+    }
+  };
+
+  if (isConnected && address) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
-            <UserAvatarProfile user={user} />
+            <WalletAvatar address={address} className='h-8 w-8' />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -32,28 +53,52 @@ export function UserNav() {
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col space-y-1'>
               <p className='text-sm leading-none font-medium'>
-                {user.fullName}
+                {truncateAddress(address)}
               </p>
               <p className='text-muted-foreground text-xs leading-none'>
-                {user.emailAddresses[0].emailAddress}
+                {chain?.name || 'Unknown Network'}
               </p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
-              Profile
+            <DropdownMenuItem onClick={copyAddress}>
+              <Copy className='mr-2 h-4 w-4' />
+              Copy Address
             </DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem>New Team</DropdownMenuItem>
+            <DropdownMenuItem onClick={openExplorer}>
+              <ExternalLink className='mr-2 h-4 w-4' />
+              View on Explorer
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <SignOutButton redirectUrl='/auth/sign-in' />
+          <DropdownMenuItem onClick={() => disconnect()}>
+            <LogOut className='mr-2 h-4 w-4' />
+            Disconnect
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     );
   }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button disabled={isPending} className='gap-2'>
+          <Wallet className='h-4 w-4' />
+          {isPending ? 'Connecting...' : 'Connect Wallet'}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align='end'>
+        {connectors.map((connector) => (
+          <DropdownMenuItem
+            key={connector.uid}
+            onClick={() => connect({ connector })}
+          >
+            {connector.name}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
