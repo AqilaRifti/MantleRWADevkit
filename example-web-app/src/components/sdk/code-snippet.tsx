@@ -47,10 +47,15 @@ export interface CodeSnippetProps {
 
 /**
  * Simple syntax highlighting for TypeScript/JavaScript
+ * Uses inline styles to avoid Tailwind class purging issues
  */
 function highlightCode(code: string, language: string): string {
     if (language === 'json') {
-        return code;
+        // Escape HTML for JSON
+        return code
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     }
 
     // Keywords
@@ -63,47 +68,47 @@ function highlightCode(code: string, language: string): string {
 
     let highlighted = code;
 
-    // Escape HTML
+    // Escape HTML first
     highlighted = highlighted
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
 
-    // Comments (// and /* */)
+    // Comments (// and /* */) - gray italic
     highlighted = highlighted.replace(
         /(\/\/.*$)/gm,
-        '<span class="text-muted-foreground italic">$1</span>'
+        '<span style="color: #6b7280; font-style: italic;">$1</span>'
     );
     highlighted = highlighted.replace(
         /(\/\*[\s\S]*?\*\/)/g,
-        '<span class="text-muted-foreground italic">$1</span>'
+        '<span style="color: #6b7280; font-style: italic;">$1</span>'
     );
 
-    // Strings
+    // Strings - green
     highlighted = highlighted.replace(
         /(['"`])((?:\\.|(?!\1)[^\\])*?)\1/g,
-        '<span class="text-green-500 dark:text-green-400">$1$2$1</span>'
+        '<span style="color: #22c55e;">$1$2$1</span>'
     );
 
-    // Keywords
+    // Keywords - purple
     keywords.forEach(keyword => {
         const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
         highlighted = highlighted.replace(
             regex,
-            '<span class="text-purple-500 dark:text-purple-400 font-medium">$1</span>'
+            '<span style="color: #a855f7; font-weight: 500;">$1</span>'
         );
     });
 
-    // Numbers
+    // Numbers - orange
     highlighted = highlighted.replace(
         /\b(\d+n?)\b/g,
-        '<span class="text-orange-500 dark:text-orange-400">$1</span>'
+        '<span style="color: #f97316;">$1</span>'
     );
 
-    // Function calls
+    // Function calls - blue
     highlighted = highlighted.replace(
         /\b([a-zA-Z_]\w*)\s*\(/g,
-        '<span class="text-blue-500 dark:text-blue-400">$1</span>('
+        '<span style="color: #3b82f6;">$1</span>('
     );
 
     return highlighted;
