@@ -175,7 +175,7 @@ export function KYCFlow({
                     <p className="mt-2 text-red-700 dark:text-red-300">{error.message}</p>
                     <button
                         onClick={handleRetry}
-                        className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                        className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                     >
                         Retry
                     </button>
@@ -228,7 +228,7 @@ export function KYCFlow({
                     </p>
                     <button
                         onClick={fetchKYCData}
-                        className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                        className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                     >
                         Check Status
                     </button>
@@ -254,7 +254,7 @@ export function KYCFlow({
                 ) : (
                     <button
                         onClick={handleStartVerification}
-                        className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                        className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                     >
                         Start Verification
                     </button>

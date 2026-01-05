@@ -117,7 +117,7 @@ export default function InvestorPortalPage() {
 
     // Calculate portfolio value
     const portfolioValue = balance && tokenInfo
-        ? (Number(balance) / Math.pow(10, tokenInfo.decimals)) * propertyDetails.tokenPrice
+        ? (Number(balance) / Math.pow(10, Number(tokenInfo.decimals))) * propertyDetails.tokenPrice
         : 0;
 
     return (

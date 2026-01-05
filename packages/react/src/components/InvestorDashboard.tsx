@@ -190,7 +190,7 @@ export function InvestorDashboard({
                     <p className="mt-2 text-red-700 dark:text-red-300">{error.message}</p>
                     <button
                         onClick={fetchData}
-                        className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                        className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                     >
                         Retry
                     </button>
@@ -208,7 +208,7 @@ export function InvestorDashboard({
                     {tokenInfo && balance !== null && (
                         <div className="mt-4">
                             <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                                {formatTokenAmount(balance, tokenInfo.decimals, tokenInfo.symbol)}
+                                {formatTokenAmount(balance, Number(tokenInfo.decimals), tokenInfo.symbol)}
                             </p>
                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                 {tokenInfo.name}
@@ -254,7 +254,7 @@ export function InvestorDashboard({
                             <button
                                 onClick={handleClaimAll}
                                 disabled={isClaiming}
-                                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white rounded-md transition-colors text-sm"
+                                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:dark:bg-gray-600 text-white font-medium rounded-md transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                             >
                                 {isClaiming ? 'Claiming...' : 'Claim All'}
                             </button>
@@ -283,7 +283,7 @@ export function InvestorDashboard({
                                             <button
                                                 onClick={() => handleClaim(claim.distributionId)}
                                                 disabled={isClaiming}
-                                                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded text-sm transition-colors"
+                                                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:dark:bg-gray-600 text-white font-medium rounded text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                                             >
                                                 Claim
                                             </button>

@@ -136,7 +136,7 @@ export function YieldCalculator({
                             type="button"
                             onClick={handleCalculate}
                             disabled={isLoading || !amount}
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-r-md transition-colors"
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:dark:bg-gray-600 text-white font-medium rounded-r-md transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
                         >
                             {isLoading ? 'Calculating...' : 'Calculate'}
                         </button>

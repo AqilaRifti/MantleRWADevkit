@@ -1,6 +1,6 @@
 {
   "name": "@mantle-rwa/react",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "React components for RWA tokenization on Mantle Network",
   "license": "MIT",
   "type": "module",
@@ -32,7 +32,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mantle-rwa/sdk": "^0.1.2"
+    "@mantle-rwa/sdk": "^0.1.4"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.2.0",

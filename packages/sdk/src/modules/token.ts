@@ -72,7 +72,8 @@ export class TokenInstance {
      * Get token decimals
      */
     async decimals(): Promise<number> {
-        return this._contract.decimals();
+        const decimals = await this._contract.decimals();
+        return Number(decimals);
     }
 
     /**

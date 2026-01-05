@@ -1,6 +1,6 @@
 {
     "name": "@mantle-rwa/sdk",
-    "version": "0.1.2",
+    "version": "0.1.4",
     "description": "TypeScript SDK for RWA tokenization on Mantle Network",
     "license": "MIT",
     "type": "module",

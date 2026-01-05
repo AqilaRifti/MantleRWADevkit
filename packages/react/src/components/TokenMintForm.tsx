@@ -202,8 +202,8 @@ export function TokenMintForm({
                         onBlur={checkKYC}
                         placeholder="0x..."
                         className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white ${validation.recipientError
-                                ? 'border-red-500 focus:border-red-500'
-                                : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
                             }`}
                     />
                     {validation.recipientError && (
@@ -238,8 +238,8 @@ export function TokenMintForm({
                         onChange={handleAmountChange}
                         placeholder="0.00"
                         className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white ${validation.amountError
-                                ? 'border-red-500 focus:border-red-500'
-                                : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
+                            ? 'border-red-500 focus:border-red-500'
+                            : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
                             }`}
                     />
                     {validation.amountError && (
@@ -276,9 +276,9 @@ export function TokenMintForm({
                 <button
                     type="submit"
                     disabled={!canSubmit}
-                    className={`w-full py-2 px-4 rounded-md font-medium transition-colors ${canSubmit
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                            : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    className={`w-full py-2 px-4 rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${canSubmit
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-300 cursor-not-allowed'
                         }`}
                 >
                     {isPending ? 'Minting...' : kycCheck.isVerified === null && form.recipient ? 'Check KYC & Mint' : 'Mint Tokens'}
