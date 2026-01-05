@@ -2,21 +2,9 @@
 
 /**
  * CodeSnippet - Collapsible code display component with syntax highlighting
- * 
- * Displays SDK code examples with copy-to-clipboard functionality and
- * optional collapsible behavior.
- * 
- * @example
- * ```tsx
- * <CodeSnippet
- *   title="Get Token Balance"
- *   code={`const balance = await client.token.balanceOf(address);`}
- *   language="typescript"
- * />
- * ```
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,91 +15,140 @@ import {
 import { Check, ChevronDown, ChevronRight, Copy, Code2 } from 'lucide-react';
 
 export interface CodeSnippetProps {
-    /** Title displayed above the code */
     title?: string;
-    /** The code to display */
     code: string;
-    /** Programming language for syntax highlighting */
     language?: 'typescript' | 'javascript' | 'json' | 'solidity';
-    /** Whether the snippet is collapsible */
     collapsible?: boolean;
-    /** Whether the snippet starts expanded (only applies if collapsible) */
     defaultExpanded?: boolean;
-    /** Import statements to show at the top */
     imports?: string;
-    /** Additional CSS classes */
     className?: string;
-    /** Show line numbers */
     showLineNumbers?: boolean;
 }
 
-/**
- * Simple syntax highlighting for TypeScript/JavaScript
- * Uses inline styles to avoid Tailwind class purging issues
- */
-function highlightCode(code: string, language: string): string {
-    if (language === 'json') {
-        // Escape HTML for JSON
-        return code
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-    }
+interface Token {
+    type: 'keyword' | 'string' | 'comment' | 'number' | 'function' | 'text';
+    value: string;
+}
 
-    // Keywords
-    const keywords = [
+/**
+ * Tokenize code for syntax highlighting
+ */
+function tokenize(code: string): Token[] {
+    const tokens: Token[] = [];
+    const keywords = new Set([
         'const', 'let', 'var', 'function', 'async', 'await', 'return',
         'if', 'else', 'for', 'while', 'try', 'catch', 'throw', 'new',
         'import', 'from', 'export', 'default', 'class', 'extends',
         'interface', 'type', 'enum', 'true', 'false', 'null', 'undefined',
-    ];
+    ]);
 
-    let highlighted = code;
+    let i = 0;
+    while (i < code.length) {
+        // Single-line comment
+        if (code[i] === '/' && code[i + 1] === '/') {
+            let comment = '';
+            while (i < code.length && code[i] !== '\n') {
+                comment += code[i++];
+            }
+            tokens.push({ type: 'comment', value: comment });
+            continue;
+        }
 
-    // Escape HTML first
-    highlighted = highlighted
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        // Multi-line comment
+        if (code[i] === '/' && code[i + 1] === '*') {
+            let comment = '/*';
+            i += 2;
+            while (i < code.length && !(code[i] === '*' && code[i + 1] === '/')) {
+                comment += code[i++];
+            }
+            if (i < code.length) {
+                comment += '*/';
+                i += 2;
+            }
+            tokens.push({ type: 'comment', value: comment });
+            continue;
+        }
 
-    // Comments (// and /* */) - gray italic
-    highlighted = highlighted.replace(
-        /(\/\/.*$)/gm,
-        '<span style="color: #6b7280; font-style: italic;">$1</span>'
+        // String (single, double, or backtick)
+        if (code[i] === '"' || code[i] === "'" || code[i] === '`') {
+            const quote = code[i];
+            let str = quote;
+            i++;
+            while (i < code.length && code[i] !== quote) {
+                if (code[i] === '\\' && i + 1 < code.length) {
+                    str += code[i++];
+                }
+                str += code[i++];
+            }
+            if (i < code.length) {
+                str += code[i++];
+            }
+            tokens.push({ type: 'string', value: str });
+            continue;
+        }
+
+        // Number
+        if (/\d/.test(code[i])) {
+            let num = '';
+            while (i < code.length && /[\d.n]/.test(code[i])) {
+                num += code[i++];
+            }
+            tokens.push({ type: 'number', value: num });
+            continue;
+        }
+
+        // Word (keyword or identifier)
+        if (/[a-zA-Z_$]/.test(code[i])) {
+            let word = '';
+            while (i < code.length && /[a-zA-Z0-9_$]/.test(code[i])) {
+                word += code[i++];
+            }
+            // Check if it's a function call
+            let j = i;
+            while (j < code.length && /\s/.test(code[j])) j++;
+            if (code[j] === '(') {
+                tokens.push({ type: 'function', value: word });
+            } else if (keywords.has(word)) {
+                tokens.push({ type: 'keyword', value: word });
+            } else {
+                tokens.push({ type: 'text', value: word });
+            }
+            continue;
+        }
+
+        // Other characters
+        tokens.push({ type: 'text', value: code[i++] });
+    }
+
+    return tokens;
+}
+
+/**
+ * Render highlighted code as React elements
+ */
+function HighlightedCode({ code }: { code: string }) {
+    const tokens = useMemo(() => tokenize(code), [code]);
+
+    return (
+        <>
+            {tokens.map((token, i) => {
+                switch (token.type) {
+                    case 'keyword':
+                        return <span key={i} className="text-purple-500 font-medium">{token.value}</span>;
+                    case 'string':
+                        return <span key={i} className="text-green-500">{token.value}</span>;
+                    case 'comment':
+                        return <span key={i} className="text-gray-500 italic">{token.value}</span>;
+                    case 'number':
+                        return <span key={i} className="text-orange-500">{token.value}</span>;
+                    case 'function':
+                        return <span key={i} className="text-blue-500">{token.value}</span>;
+                    default:
+                        return <span key={i}>{token.value}</span>;
+                }
+            })}
+        </>
     );
-    highlighted = highlighted.replace(
-        /(\/\*[\s\S]*?\*\/)/g,
-        '<span style="color: #6b7280; font-style: italic;">$1</span>'
-    );
-
-    // Strings - green
-    highlighted = highlighted.replace(
-        /(['"`])((?:\\.|(?!\1)[^\\])*?)\1/g,
-        '<span style="color: #22c55e;">$1$2$1</span>'
-    );
-
-    // Keywords - purple
-    keywords.forEach(keyword => {
-        const regex = new RegExp(`\\b(${keyword})\\b`, 'g');
-        highlighted = highlighted.replace(
-            regex,
-            '<span style="color: #a855f7; font-weight: 500;">$1</span>'
-        );
-    });
-
-    // Numbers - orange
-    highlighted = highlighted.replace(
-        /\b(\d+n?)\b/g,
-        '<span style="color: #f97316;">$1</span>'
-    );
-
-    // Function calls - blue
-    highlighted = highlighted.replace(
-        /\b([a-zA-Z_]\w*)\s*\(/g,
-        '<span style="color: #3b82f6;">$1</span>('
-    );
-
-    return highlighted;
 }
 
 export function CodeSnippet({
@@ -140,17 +177,12 @@ export function CodeSnippet({
     }, [fullCode]);
 
     const codeLines = code.split('\n');
-    const highlightedCode = highlightCode(code, language);
 
     const codeContent = (
         <div className="relative group">
             {imports && (
                 <div className="px-4 py-2 bg-muted/30 border-b text-xs font-mono text-muted-foreground">
-                    <span
-                        dangerouslySetInnerHTML={{
-                            __html: highlightCode(imports, language),
-                        }}
-                    />
+                    <HighlightedCode code={imports} />
                 </div>
             )}
             <div className="relative">
@@ -167,10 +199,9 @@ export function CodeSnippet({
                             ))}
                         </div>
                     )}
-                    <code
-                        className="leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: highlightedCode }}
-                    />
+                    <code className="leading-relaxed">
+                        <HighlightedCode code={code} />
+                    </code>
                 </pre>
                 <Button
                     variant="ghost"
