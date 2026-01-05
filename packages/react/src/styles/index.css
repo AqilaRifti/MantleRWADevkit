@@ -1,28 +1,82 @@
+/**
+ * @mantle-rwa/react - Default Styles
+ * 
+ * Tailwind CSS styles for RWA React components.
+ * Import this file in your application to use default styling.
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom component styles */
-.rwa-card {
-    @apply rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800;
+/* Base component styles */
+@layer components {
+
+    /* KYC Flow */
+    .rwa-kyc-flow {
+        @apply w-full;
+    }
+
+    /* Investor Dashboard */
+    .rwa-investor-dashboard {
+        @apply w-full;
+    }
+
+    /* Token Mint Form */
+    .rwa-token-mint-form {
+        @apply w-full max-w-md;
+    }
+
+    /* Yield Calculator */
+    .rwa-yield-calculator {
+        @apply w-full;
+    }
+
+    /* Error Display */
+    .rwa-error-display {
+        @apply w-full;
+    }
+
+    /* Loading Spinner */
+    .rwa-loading-spinner {
+        @apply inline-flex items-center justify-center;
+    }
+
+    /* Connect Wallet Prompt */
+    .rwa-connect-wallet-prompt {
+        @apply w-full;
+    }
 }
 
-.rwa-button {
-    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
+/* Dark mode support */
+@layer utilities {
+
+    .dark .rwa-kyc-flow,
+    .dark .rwa-investor-dashboard,
+    .dark .rwa-token-mint-form,
+    .dark .rwa-yield-calculator {
+        @apply text-gray-100;
+    }
 }
 
-.rwa-button-primary {
-    @apply rwa-button bg-mantle-600 text-white hover:bg-mantle-700 focus:ring-mantle-500;
+/* Custom animations */
+@keyframes rwa-spin {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.rwa-button-secondary {
-    @apply rwa-button border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-mantle-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700;
+.rwa-animate-spin {
+    animation: rwa-spin 1s linear infinite;
 }
 
-.rwa-input {
-    @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-mantle-500 focus:outline-none focus:ring-1 focus:ring-mantle-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500;
-}
+/* Focus styles for accessibility */
+@layer utilities {
+    .rwa-focus-ring {
+        @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+    }
 
-.rwa-label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-200;
+    .dark .rwa-focus-ring {
+        @apply focus:ring-offset-gray-900;
+    }
 }

@@ -23,6 +23,26 @@ export const navItems: NavItem[] = [
     items: []
   },
   {
+    title: 'SDK',
+    url: '#',
+    icon: 'product',
+    isActive: true,
+    items: [
+      {
+        title: 'Playground',
+        url: '/playground',
+        icon: 'dashboard',
+        shortcut: ['s', 'p']
+      },
+      {
+        title: 'React Components',
+        url: '/components-demo',
+        icon: 'kanban',
+        shortcut: ['s', 'r']
+      }
+    ]
+  },
+  {
     title: 'Admin',
     url: '#',
     icon: 'product',

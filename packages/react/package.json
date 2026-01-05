@@ -1,6 +1,6 @@
 {
   "name": "@mantle-rwa/react",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React components for RWA tokenization on Mantle Network",
   "license": "MIT",
   "type": "module",
@@ -32,7 +32,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mantle-rwa/sdk": "^0.1.0"
+    "@mantle-rwa/sdk": "^0.1.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.2.0",
@@ -47,6 +47,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "ethers": "^6.11.0",
     "fast-check": "^3.15.0",
     "jsdom": "^24.0.0",
     "postcss": "^8.4.33",
@@ -58,7 +59,8 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "wagmi": "^2.0.0",
-    "viem": "^2.0.0"
+    "viem": "^2.0.0",
+    "ethers": "^6.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
