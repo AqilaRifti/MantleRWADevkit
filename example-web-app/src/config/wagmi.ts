@@ -18,15 +18,22 @@ export const wagmiConfig = createConfig({
 });
 
 // Contract addresses for the RWA system (deployed on Mantle Sepolia)
+const DEPLOYED_ADDRESSES = {
+    rwaToken: '0x55cF1E241F89D9c3D4c3947205e232a8155CCCb3',
+    kycRegistry: '0xc17EbFdfc5DFfffb76da3204d36FA0eAf0D0744d',
+    yieldDistributor: '0xC699372FD575C75397B7611A783baB9432693cC7',
+    assetVault: '0x21130B278E39e60165ae3f4677356CBe302E6AD5',
+    rwaFactory: '',
+    mockUsdc: '',
+};
+
 export const contractAddresses = {
-    // These will be populated after deployment
-    rwaToken: process.env.NEXT_PUBLIC_RWA_TOKEN_ADDRESS || '',
-    kycRegistry: process.env.NEXT_PUBLIC_KYC_REGISTRY_ADDRESS || '',
-    yieldDistributor: process.env.NEXT_PUBLIC_YIELD_DISTRIBUTOR_ADDRESS || '',
-    assetVault: process.env.NEXT_PUBLIC_ASSET_VAULT_ADDRESS || '',
-    rwaFactory: process.env.NEXT_PUBLIC_RWA_FACTORY_ADDRESS || '',
-    // Mock USDC for testnet
-    mockUsdc: process.env.NEXT_PUBLIC_MOCK_USDC_ADDRESS || '',
+    rwaToken: process.env.NEXT_PUBLIC_RWA_TOKEN_ADDRESS || DEPLOYED_ADDRESSES.rwaToken,
+    kycRegistry: process.env.NEXT_PUBLIC_KYC_REGISTRY_ADDRESS || DEPLOYED_ADDRESSES.kycRegistry,
+    yieldDistributor: process.env.NEXT_PUBLIC_YIELD_DISTRIBUTOR_ADDRESS || DEPLOYED_ADDRESSES.yieldDistributor,
+    assetVault: process.env.NEXT_PUBLIC_ASSET_VAULT_ADDRESS || DEPLOYED_ADDRESSES.assetVault,
+    rwaFactory: process.env.NEXT_PUBLIC_RWA_FACTORY_ADDRESS || DEPLOYED_ADDRESSES.rwaFactory,
+    mockUsdc: process.env.NEXT_PUBLIC_MOCK_USDC_ADDRESS || DEPLOYED_ADDRESSES.mockUsdc,
 } as const;
 
 // Property details for the Miami Luxury Condo tokenization
