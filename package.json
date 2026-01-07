@@ -2,7 +2,6 @@
     "name": "mantle-rwa-sdk",
     "version": "0.1.0",
     "private": true,
-    "packageManager": "pnpm@9.15.4",
     "description": "Comprehensive SDK for Real-World Asset tokenization on Mantle Network",
     "license": "MIT",
     "workspaces": [

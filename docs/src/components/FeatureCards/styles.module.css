@@ -1,0 +1,120 @@
+.features {
+    padding: 5rem 2rem;
+    background: var(--ifm-background-surface-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    color: var(--ifm-font-color-base);
+}
+
+.subtitle {
+    font-size: 1.125rem;
+    color: var(--ifm-font-color-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.card {
+    background: var(--ifm-background-color);
+    border: 1px solid var(--ifm-toc-border-color);
+    border-radius: 12px;
+    padding: 1.75rem;
+    transition: all 0.2s ease;
+}
+
+.card:hover {
+    border-color: var(--ifm-color-primary);
+    box-shadow: 0 8px 24px rgba(101, 179, 174, 0.1);
+    transform: translateY(-4px);
+}
+
+.iconWrapper {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(101, 179, 174, 0.15) 0%, rgba(79, 163, 158, 0.15) 100%);
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    color: var(--ifm-color-primary);
+}
+
+.iconWrapper svg {
+    width: 24px;
+    height: 24px;
+}
+
+.cardTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--ifm-font-color-base);
+}
+
+.cardDescription {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--ifm-font-color-secondary);
+    margin-bottom: 1rem;
+}
+
+.cardLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--ifm-color-primary);
+    text-decoration: none;
+    transition: gap 0.2s ease;
+}
+
+.cardLink:hover {
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.linkIcon {
+    width: 16px;
+    height: 16px;
+}
+
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .features {
+        padding: 3rem 1.5rem;
+    }
+
+    .title {
+        font-size: 1.75rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
