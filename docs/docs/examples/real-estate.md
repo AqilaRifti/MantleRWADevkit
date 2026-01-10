@@ -102,7 +102,7 @@ await yieldModule.distribute({
 
 ## Complete Example
 
-See the full implementation in our [example repository](https://github.com/mantle-network/mantle-rwa-sdk/tree/main/examples/real-estate).
+See the full implementation in our [example repository](https://github.com/AqilaRifti/MantleRWADevkit/tree/main/examples/real-estate).
 
 ## See Also
 

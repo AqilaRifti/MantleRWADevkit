@@ -534,7 +534,7 @@ await client.deployRWASystem(config);
 
 ## Support
 
-- [GitHub Issues](https://github.com/mantle-network/mantle-rwa-sdk/issues)
-- [Discord Community](https://discord.gg/0xMantle)
-- [Documentation](https://docs.mantle-rwa.xyz)
-- [Examples Repository](https://github.com/mantle-network/mantle-rwa-sdk/tree/main/examples)
+- [GitHub Issues](https://github.com/AqilaRifti/MantleRWADevkit/issues)
+- [GitHub Discussions](https://github.com/AqilaRifti/MantleRWADevkit/discussions)
+- [Documentation](https://mantle-rwa-devkit-docs.vercel.app/)
+- [Examples Repository](https://github.com/AqilaRifti/MantleRWADevkit/tree/main/examples)

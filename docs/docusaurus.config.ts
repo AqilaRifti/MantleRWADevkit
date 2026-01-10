@@ -11,11 +11,11 @@ const config: Config = {
     v4: true,
   },
 
-  url: 'https://rwa-sdk.mantle.xyz',
+  url: 'https://mantle-rwa-devkit-docs.vercel.app',
   baseUrl: '/',
 
-  organizationName: 'mantle-network',
-  projectName: 'mantle-rwa-sdk',
+  organizationName: 'AqilaRifti',
+  projectName: 'MantleRWADevkit',
 
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
@@ -45,7 +45,7 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/mantle-network/mantle-rwa-sdk/tree/main/docs/',
+          editUrl: 'https://github.com/AqilaRifti/MantleRWADevkit/tree/main/docs/',
           showLastUpdateTime: true,
           showLastUpdateAuthor: true,
         },
@@ -66,7 +66,7 @@ const config: Config = {
     },
     announcementBar: {
       id: 'beta_announcement',
-      content: '🚀 Mantle RWA SDK is in beta. <a href="/docs/getting-started/quick-start">Get started</a> or <a href="https://github.com/mantle-network/mantle-rwa-sdk">star us on GitHub</a>!',
+      content: '🚀 Mantle RWA Devkit is in beta. <a href="/docs/getting-started/quick-start">Get started</a> or <a href="https://github.com/AqilaRifti/MantleRWADevkit">star us on GitHub</a>!',
       backgroundColor: '#65B3AE',
       textColor: '#000000',
       isCloseable: true,
@@ -96,16 +96,16 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://github.com/mantle-network/mantle-rwa-sdk',
+          href: 'https://github.com/AqilaRifti/MantleRWADevkit',
           position: 'right',
           className: 'header-github-link',
           'aria-label': 'GitHub repository',
         },
         {
-          href: 'https://discord.gg/0xMantle',
+          href: 'https://github.com/AqilaRifti/MantleRWADevkit/discussions',
           position: 'right',
           className: 'header-discord-link',
-          'aria-label': 'Discord community',
+          'aria-label': 'GitHub Discussions',
         },
       ],
     },
@@ -133,16 +133,16 @@ const config: Config = {
           title: 'Community',
           items: [
             {
-              label: 'Discord',
-              href: 'https://discord.gg/0xMantle',
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/0xMantle',
-            },
-            {
               label: 'GitHub Discussions',
-              href: 'https://github.com/mantle-network/mantle-rwa-sdk/discussions',
+              href: 'https://github.com/AqilaRifti/MantleRWADevkit/discussions',
+            },
+            {
+              label: 'GitHub',
+              href: 'https://github.com/AqilaRifti/MantleRWADevkit',
+            },
+            {
+              label: 'Live Demo',
+              href: 'https://mantle-rwa-devkit-demo.vercel.app/',
             },
           ],
         },
@@ -164,7 +164,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `© ${new Date().getFullYear()} Mantle Network. Built for developers, by developers.`,
+      copyright: `© ${new Date().getFullYear()} Aqila Rifti. Built for developers, by developers.`,
     },
     prism: {
       theme: prismThemes.github,

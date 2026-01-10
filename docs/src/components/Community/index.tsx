@@ -13,7 +13,7 @@ export default function Community(): React.ReactElement {
                     </p>
                     <div className={styles.links}>
                         <a
-                            href="https://discord.gg/0xMantle"
+                            href="https://github.com/AqilaRifti/MantleRWADevkit/discussions"
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.link}
@@ -27,7 +27,7 @@ export default function Community(): React.ReactElement {
                             </div>
                         </a>
                         <a
-                            href="https://github.com/mantle-network/mantle-rwa-sdk"
+                            href="https://github.com/AqilaRifti/MantleRWADevkit"
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.link}
@@ -41,7 +41,7 @@ export default function Community(): React.ReactElement {
                             </div>
                         </a>
                         <a
-                            href="https://twitter.com/0xMantle"
+                            href="https://github.com/AqilaRifti"
                             target="_blank"
                             rel="noopener noreferrer"
                             className={styles.link}

@@ -105,13 +105,13 @@ Currently, investors must manually claim yields. Auto-compounding can be impleme
 
 ### Where can I get help?
 
-- [Discord Community](https://discord.gg/0xMantle)
-- [GitHub Issues](https://github.com/mantle-network/mantle-rwa-sdk/issues)
+- [GitHub Discussions](https://github.com/AqilaRifti/MantleRWADevkit/discussions)
+- [GitHub Issues](https://github.com/AqilaRifti/MantleRWADevkit/issues)
 - [Documentation](/docs/intro)
 
 ### How do I report a bug?
 
-Open an issue on [GitHub](https://github.com/mantle-network/mantle-rwa-sdk/issues) with:
+Open an issue on [GitHub](https://github.com/AqilaRifti/MantleRWADevkit/issues) with:
 - SDK version
 - Steps to reproduce
 - Expected vs actual behavior
@@ -119,4 +119,4 @@ Open an issue on [GitHub](https://github.com/mantle-network/mantle-rwa-sdk/issue
 
 ### Is there a bug bounty program?
 
-Yes, we have an active bug bounty program. See our [security policy](https://github.com/mantle-network/mantle-rwa-sdk/security) for details.
+Yes, we have an active bug bounty program. See our [security policy](https://github.com/AqilaRifti/MantleRWADevkit/security) for details.

@@ -144,6 +144,6 @@ console.log('Token deployed:', deployment.token.address);
 
 ## Community & Support
 
-- **Discord**: [Join our community](https://discord.gg/0xMantle)
-- **GitHub**: [Report issues & contribute](https://github.com/mantle-network/mantle-rwa-sdk)
-- **Twitter**: [Follow for updates](https://twitter.com/0xMantle)
+- **GitHub**: [Report issues & contribute](https://github.com/AqilaRifti/MantleRWADevkit)
+- **Documentation**: [Full docs](https://mantle-rwa-devkit-docs.vercel.app/)
+- **Live Demo**: [Try it out](https://mantle-rwa-devkit-demo.vercel.app/)

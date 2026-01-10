@@ -97,7 +97,7 @@ export default function DashboardPage() {
 
 ## Live Demo
 
-Check out the [example-web-app](https://github.com/mantle-network/mantle-rwa-sdk/tree/main/example-web-app) in our repository for the complete implementation.
+Check out the [example-web-app](https://github.com/AqilaRifti/MantleRWADevkit/tree/main/example-web-app) in our repository for the complete implementation.
 
 ## See Also
 

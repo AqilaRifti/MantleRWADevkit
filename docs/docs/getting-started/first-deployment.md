@@ -294,4 +294,4 @@ npx hardhat verify --network mantle-sepolia CONTRACT_ADDRESS
 
 - [FAQ](/docs/resources/faq)
 - [Troubleshooting Guide](/docs/resources/troubleshooting)
-- [Discord Community](https://discord.gg/0xMantle)
+- [GitHub Discussions](https://github.com/AqilaRifti/MantleRWADevkit/discussions)

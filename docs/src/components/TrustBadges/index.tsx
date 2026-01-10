@@ -7,13 +7,13 @@ export default function TrustBadges(): React.ReactElement {
             <div className={styles.container}>
                 <div className={styles.badgeList}>
                     <a
-                        href="https://github.com/mantle-network/mantle-rwa-sdk"
+                        href="https://github.com/AqilaRifti/MantleRWADevkit"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.badge}
                     >
                         <img
-                            src="https://img.shields.io/github/stars/mantle-network/mantle-rwa-sdk?style=flat&logo=github&label=Stars&color=65B3AE"
+                            src="https://img.shields.io/github/stars/AqilaRifti/MantleRWADevkit?style=flat&logo=github&label=Stars&color=65B3AE"
                             alt="GitHub Stars"
                         />
                     </a>
@@ -40,13 +40,13 @@ export default function TrustBadges(): React.ReactElement {
                         />
                     </a>
                     <a
-                        href="https://github.com/mantle-network/mantle-rwa-sdk/blob/main/LICENSE"
+                        href="https://github.com/AqilaRifti/MantleRWADevkit/blob/main/LICENSE"
                         target="_blank"
                         rel="noopener noreferrer"
                         className={styles.badge}
                     >
                         <img
-                            src="https://img.shields.io/github/license/mantle-network/mantle-rwa-sdk?style=flat&label=License&color=65B3AE"
+                            src="https://img.shields.io/github/license/AqilaRifti/MantleRWADevkit?style=flat&label=License&color=65B3AE"
                             alt="License"
                         />
                     </a>

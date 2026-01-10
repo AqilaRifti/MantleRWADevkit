@@ -156,6 +156,6 @@ import { useRWA } from '@mantle-rwa/react';
 If you can't resolve your issue:
 
 1. Check the [FAQ](/docs/resources/faq)
-2. Search [GitHub Issues](https://github.com/mantle-network/mantle-rwa-sdk/issues)
-3. Ask in [Discord](https://discord.gg/0xMantle)
+2. Search [GitHub Issues](https://github.com/AqilaRifti/MantleRWADevkit/issues)
+3. Ask in [GitHub Discussions](https://github.com/AqilaRifti/MantleRWADevkit/discussions)
 4. Open a new issue with details

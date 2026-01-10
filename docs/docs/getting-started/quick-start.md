@@ -236,6 +236,6 @@ If transactions are timing out:
 
 ### Need Help?
 
-- Join our [Discord](https://discord.gg/0xMantle) for community support
+- Check the [GitHub Discussions](https://github.com/AqilaRifti/MantleRWADevkit/discussions) for community support
 - Check the [FAQ](/docs/resources/faq) for common questions
-- Open an issue on [GitHub](https://github.com/mantle-network/mantle-rwa-sdk/issues)
+- Open an issue on [GitHub](https://github.com/AqilaRifti/MantleRWADevkit/issues)

@@ -56,4 +56,4 @@ All notable changes to the Mantle RWA SDK.
 
 ---
 
-For the latest updates, follow us on [Twitter](https://twitter.com/0xMantle) or join our [Discord](https://discord.gg/0xMantle).
+For the latest updates, follow us on [GitHub](https://github.com/AqilaRifti/MantleRWADevkit).
